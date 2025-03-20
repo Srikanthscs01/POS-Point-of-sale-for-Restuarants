@@ -23,7 +23,10 @@ const OrderItem = ({
   onRemoveItem,
   calculateItemTotal
 }: OrderItemProps) => {
-  const hasCustomizations = (item.selectedVariation || (item.selectedAddons && item.selectedAddons.length > 0));
+  // Helper function to determine if an item has customizations
+  const hasCustomizations = (item: MenuItem): boolean => {
+    return !!(item.selectedVariation || (item.selectedAddons && item.selectedAddons.length > 0));
+  };
 
   return (
     <motion.div
