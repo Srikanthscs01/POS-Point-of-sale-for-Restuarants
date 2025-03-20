@@ -67,12 +67,15 @@ const OrderContent = ({
         )}
       </div>
 
-      <div className="flex-1 flex flex-col">
+      {/* Order content area - made scrollable */}
+      <div className="flex-1 overflow-hidden flex flex-col">
         {items.length === 0 ? (
-          <EmptyOrderState />
+          <div className="flex-1 flex items-center justify-center">
+            <EmptyOrderState />
+          </div>
         ) : (
-          <ScrollArea className="flex-1 h-[calc(100vh-280px)]">
-            <div className="pr-4">
+          <ScrollArea className="flex-1 h-[calc(100vh-320px)]">
+            <div className="pr-4 pb-4">
               <AnimatePresence initial={false}>
                 {items.map((item) => (
                   <OrderItem 
@@ -91,15 +94,17 @@ const OrderContent = ({
         )}
       </div>
 
-      {/* Always show the OrderTotals component */}
-      <OrderTotals
-        total={total}
-        discount={discount}
-        appliedCoupon={appliedCoupon}
-        onCheckout={onCheckout}
-        tableNumber={tableNumber}
-        isEmpty={items.length === 0}
-      />
+      {/* Order totals with checkout button - fixed at bottom */}
+      <div className="mt-auto pt-4 border-t sticky bottom-0 bg-background">
+        <OrderTotals
+          total={total}
+          discount={discount}
+          appliedCoupon={appliedCoupon}
+          onCheckout={onCheckout}
+          tableNumber={tableNumber}
+          isEmpty={items.length === 0}
+        />
+      </div>
     </div>
   );
 };
