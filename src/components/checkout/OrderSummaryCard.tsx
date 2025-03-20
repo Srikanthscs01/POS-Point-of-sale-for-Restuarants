@@ -1,6 +1,7 @@
 
 import { Ticket } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Card,
   CardHeader,
@@ -43,7 +44,7 @@ const OrderSummaryCard = ({
           <div className="text-sm text-muted-foreground mb-3">Order items</div>
         </div>
         
-        <div className="max-h-80 overflow-y-auto px-6">
+        <ScrollArea className="max-h-80 px-6">
           {cart.map((item) => (
             <div key={item.id} className="flex justify-between py-3 border-t">
               <div>
@@ -59,7 +60,7 @@ const OrderSummaryCard = ({
               </div>
             </div>
           ))}
-        </div>
+        </ScrollArea>
         
         <div className="px-6 mt-4 pt-4 border-t">
           <div className="space-y-2">
