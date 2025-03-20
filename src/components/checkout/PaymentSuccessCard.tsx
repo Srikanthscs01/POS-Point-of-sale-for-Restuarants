@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Check, Receipt, Printer, Mail, Phone } from 'lucide-react';
+import { Check, Receipt, Printer, Mail, Phone, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Card,
@@ -175,7 +176,7 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
       return;
     }
     
-    if (activeTab === 'phone' && !phoneNumber) {
+    if ((activeTab === 'phone' || activeTab === 'whatsapp') && !phoneNumber) {
       toast.error('Please enter a phone number');
       return;
     }
@@ -195,6 +196,36 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
         toast.success(`E-bill sent to ${phoneNumber}`);
       }
       
+      if (activeTab === 'whatsapp' && phoneNumber) {
+        // Format phone number and create WhatsApp link
+        const formattedNumber = phoneNumber.replace(/[^0-9]/g, '');
+        
+        // Get order details for the message
+        const savedOrder = localStorage.getItem('currentOrder');
+        let orderTotal = 0;
+        
+        if (savedOrder) {
+          try {
+            const orderItems = JSON.parse(savedOrder);
+            orderTotal = orderItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+          } catch (e) {
+            console.error('Failed to parse saved order', e);
+          }
+        }
+        
+        // Create message text
+        const messageText = encodeURIComponent(
+          `Thank you for your order at Meal Mate!\n\n` +
+          `Your order total: $${(orderTotal * 1.07).toFixed(2)} (including tax)\n\n` +
+          `We appreciate your business!`
+        );
+        
+        // Open WhatsApp with pre-filled message
+        window.open(`https://wa.me/${formattedNumber}?text=${messageText}`, '_blank');
+        
+        toast.success(`WhatsApp opened with your receipt`);
+      }
+      
       // Reset form
       setEmail('');
       setPhoneNumber('');
@@ -203,6 +234,11 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
 
   const handleSendEBill = () => {
     setActiveTab('phone');
+    setIsReceiptDialogOpen(true);
+  };
+  
+  const handleSendWhatsApp = () => {
+    setActiveTab('whatsapp');
     setIsReceiptDialogOpen(true);
   };
   
@@ -215,7 +251,7 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
         <h2 className="text-2xl font-bold mb-2">Payment Successful</h2>
         <p className="text-muted-foreground mb-6">Your order has been completed</p>
         
-        <div className="flex justify-center space-x-3 mb-6">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -227,14 +263,15 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
               <DialogHeader>
                 <DialogTitle>Send Receipt</DialogTitle>
                 <DialogDescription>
-                  Receive your receipt via email or e-bill to your phone
+                  Receive your receipt via email, SMS, or WhatsApp
                 </DialogDescription>
               </DialogHeader>
               
               <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="py-4">
-                <TabsList className="grid grid-cols-2 mb-4">
+                <TabsList className="grid grid-cols-3 mb-4">
                   <TabsTrigger value="email">Email</TabsTrigger>
-                  <TabsTrigger value="phone">Mobile Phone</TabsTrigger>
+                  <TabsTrigger value="phone">SMS</TabsTrigger>
+                  <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="email">
@@ -265,6 +302,22 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
                     </p>
                   </div>
                 </TabsContent>
+                
+                <TabsContent value="whatsapp">
+                  <div className="grid gap-2">
+                    <Label htmlFor="whatsapp">WhatsApp number</Label>
+                    <Input
+                      id="whatsapp"
+                      type="tel"
+                      placeholder="+1 (123) 456-7890"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Include country code for international numbers
+                    </p>
+                  </div>
+                </TabsContent>
               </Tabs>
               
               <DialogFooter>
@@ -283,6 +336,11 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
           <Button variant="outline" size="sm" onClick={handleSendEBill}>
             <Phone className="h-4 w-4 mr-2" />
             Send E-Bill
+          </Button>
+          
+          <Button variant="outline" size="sm" onClick={handleSendWhatsApp}>
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Send WhatsApp
           </Button>
         </div>
         
