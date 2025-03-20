@@ -4,14 +4,17 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface MenuItemProps {
+export interface MenuItemVariation {
+  id: string;
+  name: string;
+  priceAdjustment: number;
+}
+
+export interface MenuItemAddon {
   id: string;
   name: string;
   price: number;
-  description: string;
-  image: string;
-  category: string;
-  onAddToOrder: (item: MenuItem) => void;
+  category?: string;
 }
 
 export interface MenuItem {
@@ -21,11 +24,38 @@ export interface MenuItem {
   description: string;
   image: string;
   category: string;
+  variations?: MenuItemVariation[];
+  addons?: MenuItemAddon[];
   quantity?: number;
+  selectedVariation?: MenuItemVariation;
+  selectedAddons?: MenuItemAddon[];
 }
 
-const MenuCard = ({ id, name, price, description, image, category, onAddToOrder }: MenuItemProps) => {
+interface MenuItemProps {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  category: string;
+  variations?: MenuItemVariation[];
+  addons?: MenuItemAddon[];
+  onAddToOrder: (item: MenuItem) => void;
+}
+
+const MenuCard = ({ 
+  id, 
+  name, 
+  price, 
+  description, 
+  image, 
+  category, 
+  variations, 
+  addons, 
+  onAddToOrder 
+}: MenuItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const hasCustomizations = (variations && variations.length > 0) || (addons && addons.length > 0);
 
   const handleAddToOrder = () => {
     onAddToOrder({
@@ -35,6 +65,8 @@ const MenuCard = ({ id, name, price, description, image, category, onAddToOrder 
       description,
       image,
       category,
+      variations,
+      addons,
       quantity: 1
     });
   };
@@ -69,6 +101,14 @@ const MenuCard = ({ id, name, price, description, image, category, onAddToOrder 
             </div>
           </div>
         </div>
+        
+        {hasCustomizations && (
+          <div className="absolute top-2 right-2">
+            <span className="text-xs py-0.5 px-2 bg-primary/90 text-primary-foreground backdrop-blur-sm rounded-full">
+              Customizable
+            </span>
+          </div>
+        )}
       </div>
       
       <div className="p-4">
