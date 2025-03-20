@@ -29,7 +29,7 @@ const MenuSection = ({ menuItems, onAddToOrder, tableNumber }: MenuSectionProps)
   });
 
   return (
-    <div className="w-3/4 space-y-6">
+    <div className="w-3/4 pr-4 space-y-6">
       <header>
         <h1 className="text-3xl font-bold">Menu</h1>
         <p className="text-muted-foreground mt-1">

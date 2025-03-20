@@ -23,7 +23,7 @@ const OrderSidePanel = ({
   onClearTableFilter
 }: OrderSidePanelProps) => {
   return (
-    <div className="w-1/4 pr-4">
+    <div className="w-1/4 pl-4">
       <div className="sticky top-24 h-[calc(100vh-8rem)]">
         <TableOrderAlert 
           tableNumber={tableNumber}

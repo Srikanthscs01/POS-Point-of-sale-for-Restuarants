@@ -43,7 +43,14 @@ const Orders = () => {
             addItemToOrder
           }) => (
             <>
-              {/* Virtual Check - Left Side */}
+              {/* Menu Section - Left Side (previously right) */}
+              <MenuSection 
+                menuItems={menuItems}
+                onAddToOrder={handleAddToOrder}
+                tableNumber={tableNumber}
+              />
+
+              {/* Virtual Check - Right Side (previously left) */}
               <OrderSidePanel 
                 orderItems={orderItems}
                 tableNumber={tableNumber}
@@ -52,13 +59,6 @@ const Orders = () => {
                 onClearOrder={handleClearOrder}
                 onCheckout={handleCheckout}
                 onClearTableFilter={handleClearTableFilter}
-              />
-
-              {/* Menu Section - Right Side */}
-              <MenuSection 
-                menuItems={menuItems}
-                onAddToOrder={handleAddToOrder}
-                tableNumber={tableNumber}
               />
 
               {/* Customization Dialog */}
