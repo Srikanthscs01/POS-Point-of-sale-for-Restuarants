@@ -15,7 +15,7 @@ interface BasicInfoTabProps {
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   imagePreview: string;
   setImagePreview: (url: string) => void;
-  setErrors: (errors: { [key: string]: string }) => void;
+  setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>; // Updated type definition
 }
 
 const BasicInfoTab = ({ 
