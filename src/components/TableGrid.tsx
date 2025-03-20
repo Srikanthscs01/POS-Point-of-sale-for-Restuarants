@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ExternalLink, ShoppingBag, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -35,6 +36,15 @@ const statusColors = {
 
 const TableGrid = ({ tables, onSelectTable }: TableGridProps) => {
   const [hoveredTable, setHoveredTable] = useState<number | null>(null);
+  const navigate = useNavigate();
+
+  const handleTableClick = (table: Table) => {
+    // Call the provided onSelectTable callback
+    onSelectTable(table);
+    
+    // Navigate to the orders page with table information
+    navigate(`/orders?tableId=${table.id}&tableNumber=${table.number}`);
+  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -50,7 +60,7 @@ const TableGrid = ({ tables, onSelectTable }: TableGridProps) => {
                 )}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => onSelectTable(table)}
+                onClick={() => handleTableClick(table)}
                 onHoverStart={() => setHoveredTable(table.id)}
                 onHoverEnd={() => setHoveredTable(null)}
               >
