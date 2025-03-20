@@ -84,6 +84,19 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
         setOrderItems(tableOrders[parsedTableId]);
         toast.info(`Loaded order for Table ${parsedTableNumber}`);
       }
+    } else {
+      // Check if there's a saved order in localStorage when loading the page
+      const savedOrder = localStorage.getItem('currentOrder');
+      if (savedOrder) {
+        try {
+          const parsedOrder = JSON.parse(savedOrder);
+          if (Array.isArray(parsedOrder) && parsedOrder.length > 0) {
+            setOrderItems(parsedOrder);
+          }
+        } catch (e) {
+          console.error('Failed to parse saved order', e);
+        }
+      }
     }
   }, [location.search]);
 
@@ -188,7 +201,10 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   };
 
   const handleCheckout = () => {
-    // Save the current table ID for the checkout page
+    // First save current order to localStorage
+    localStorage.setItem('currentOrder', JSON.stringify(orderItems));
+    
+    // Navigate to checkout page with the current order
     navigate('/checkout', { 
       state: { 
         items: orderItems, 

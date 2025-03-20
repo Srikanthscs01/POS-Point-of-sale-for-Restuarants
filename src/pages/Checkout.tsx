@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -22,6 +21,7 @@ import {
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [cart, setCart] = useState<MenuItem[]>([]);
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
@@ -35,25 +35,47 @@ const Checkout = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [discount, setDiscount] = useState(0);
+  const [tableNumber, setTableNumber] = useState<number | null>(null);
 
   useEffect(() => {
-    // Load cart from local storage
-    const savedOrder = localStorage.getItem('currentOrder');
-    if (savedOrder) {
-      const parsedOrder = JSON.parse(savedOrder);
-      setCart(parsedOrder);
+    let parsedOrder: MenuItem[] = [];
+    let hasOrder = false;
+    
+    if (location.state && location.state.items && Array.isArray(location.state.items)) {
+      parsedOrder = location.state.items;
+      hasOrder = parsedOrder.length > 0;
       
-      // Calculate totals
-      const cartSubtotal = parsedOrder.reduce((sum: number, item: MenuItem) => sum + (item.price * (item.quantity || 1)), 0);
+      if (location.state.tableNumber) {
+        setTableNumber(location.state.tableNumber);
+      }
+    }
+    
+    if (!hasOrder) {
+      const savedOrder = localStorage.getItem('currentOrder');
+      if (savedOrder) {
+        try {
+          parsedOrder = JSON.parse(savedOrder);
+          hasOrder = parsedOrder.length > 0;
+        } catch (e) {
+          console.error('Failed to parse saved order', e);
+        }
+      }
+    }
+    
+    if (hasOrder) {
+      setCart(parsedOrder);
+      localStorage.setItem('currentOrder', JSON.stringify(parsedOrder));
+      
+      const cartSubtotal = parsedOrder.reduce((sum: number, item: MenuItem) => 
+        sum + (item.price * (item.quantity || 1)), 0);
       setSubtotal(cartSubtotal);
       
-      // Recalculate with any applied coupon
       calculateTotals(cartSubtotal, appliedCoupon);
     } else {
-      // If no cart, redirect to orders page
+      toast.error('No items in your order. Redirecting to orders page.');
       navigate('/orders');
     }
-  }, [navigate, appliedCoupon]);
+  }, [navigate, location, appliedCoupon]);
 
   const calculateTotals = (subTotal: number, coupon: Coupon | null) => {
     let discountAmount = 0;
@@ -74,7 +96,6 @@ const Checkout = () => {
     setTax(taxAmount);
     setTotal(totalAmount);
     
-    // Recalculate tip based on discounted subtotal
     if (tipPercentage > 0) {
       setTip(discountedSubtotal * (tipPercentage / 100));
     }
@@ -97,7 +118,6 @@ const Checkout = () => {
     
     setProcessingPayment(true);
     
-    // Simulate payment processing
     setTimeout(() => {
       setProcessingPayment(false);
       setPaymentComplete(true);
