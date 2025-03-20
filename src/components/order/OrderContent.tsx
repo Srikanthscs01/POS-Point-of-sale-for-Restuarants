@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Utensils, ShoppingBag } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AnimatePresence } from 'framer-motion';
 import { MenuItem } from '@/components/MenuCard';
@@ -9,10 +9,12 @@ import OrderItem from './OrderItem';
 import OrderTotals from './OrderTotals';
 import EmptyOrderState from './EmptyOrderState';
 import { Coupon } from '@/data/sampleCoupons';
+import { OrderType } from '@/pages/orders/OrderManager';
 
 interface OrderContentProps {
   items: MenuItem[];
   tableNumber: number | null | undefined;
+  orderType: OrderType | undefined;
   expandedItems: Set<string>;
   total: number;
   discount: number;
@@ -28,6 +30,7 @@ interface OrderContentProps {
 const OrderContent = ({
   items,
   tableNumber,
+  orderType = 'dine-in',
   expandedItems,
   total,
   discount,
@@ -39,6 +42,8 @@ const OrderContent = ({
   onClearOrder,
   onCheckout
 }: OrderContentProps) => {
+  const OrderTypeIcon = orderType === 'dine-in' ? Utensils : ShoppingBag;
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
@@ -50,7 +55,11 @@ const OrderContent = ({
                 <Badge variant="outline" className="text-xs font-normal">Order</Badge>
               </div>
             ) : (
-              "Current Order"
+              <div className="flex items-center gap-2">
+                <OrderTypeIcon className="h-4 w-4" />
+                <span>{orderType === 'dine-in' ? 'Dine-In' : 'To-Go'}</span>
+                <Badge variant="outline" className="text-xs font-normal">Order</Badge>
+              </div>
             )}
           </h2>
         </div>
@@ -102,6 +111,7 @@ const OrderContent = ({
           appliedCoupon={appliedCoupon}
           onCheckout={onCheckout}
           tableNumber={tableNumber}
+          orderType={orderType}
           isEmpty={items.length === 0}
         />
       </div>

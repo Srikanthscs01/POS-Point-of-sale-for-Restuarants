@@ -3,14 +3,16 @@ import { useState } from 'react';
 import { MenuItem } from '@/components/MenuCard';
 import OrderFilters from './OrderFilters';
 import MenuItems from './MenuItems';
+import { OrderType } from './OrderManager';
 
 interface MenuSectionProps {
   menuItems: MenuItem[];
   onAddToOrder: (item: MenuItem) => void;
   tableNumber: number | null;
+  orderType: OrderType;
 }
 
-const MenuSection = ({ menuItems, onAddToOrder, tableNumber }: MenuSectionProps) => {
+const MenuSection = ({ menuItems, onAddToOrder, tableNumber, orderType }: MenuSectionProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
@@ -35,7 +37,10 @@ const MenuSection = ({ menuItems, onAddToOrder, tableNumber }: MenuSectionProps)
         <p className="text-muted-foreground mt-1">
           {tableNumber 
             ? `Add items to Table ${tableNumber}'s order` 
-            : 'Browse and add items to your order'}
+            : orderType === 'dine-in'
+              ? 'Add items to Dine-In order'
+              : 'Add items to To-Go order'
+          }
         </p>
       </header>
 

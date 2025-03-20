@@ -1,9 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { MenuItem } from '@/components/MenuCard';
 import MenuItemCustomizer from '@/components/MenuItemCustomizer';
+
+// Order type definition
+export type OrderType = 'dine-in' | 'to-go';
 
 // Sample order data for tables
 const tableOrders: Record<number, MenuItem[]> = {
@@ -44,6 +46,8 @@ interface OrderManagerProps {
   children: (props: {
     orderItems: MenuItem[];
     tableNumber: number | null;
+    orderType: OrderType;
+    setOrderType: (type: OrderType) => void;
     handleAddToOrder: (item: MenuItem) => void;
     handleUpdateQuantity: (id: string, quantity: number) => void;
     handleRemoveItem: (id: string) => void;
@@ -65,12 +69,18 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [tableId, setTableId] = useState<number | null>(null);
+  const [orderType, setOrderType] = useState<OrderType>('dine-in');
 
   // Parse URL query parameters for table information
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tableIdParam = params.get('tableId');
     const tableNumberParam = params.get('tableNumber');
+    const orderTypeParam = params.get('orderType') as OrderType | null;
+    
+    if (orderTypeParam && (orderTypeParam === 'dine-in' || orderTypeParam === 'to-go')) {
+      setOrderType(orderTypeParam);
+    }
     
     if (tableIdParam && tableNumberParam) {
       const parsedTableId = parseInt(tableIdParam);
@@ -78,6 +88,7 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
       
       setTableId(parsedTableId);
       setTableNumber(parsedTableNumber);
+      setOrderType('dine-in'); // If table is specified, it's always dine-in
       
       // Load order items for this table
       if (tableOrders[parsedTableId]) {
@@ -97,8 +108,27 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
           console.error('Failed to parse saved order', e);
         }
       }
+      
+      // Check if there's a saved order type in localStorage
+      const savedOrderType = localStorage.getItem('orderType');
+      if (savedOrderType && (savedOrderType === 'dine-in' || savedOrderType === 'to-go')) {
+        setOrderType(savedOrderType as OrderType);
+      }
     }
   }, [location.search]);
+
+  // Update order type handler
+  const handleSetOrderType = (type: OrderType) => {
+    setOrderType(type);
+    localStorage.setItem('orderType', type);
+    
+    // If switching to to-go, clear any table assignment
+    if (type === 'to-go' && tableNumber !== null) {
+      setTableId(null);
+      setTableNumber(null);
+      navigate('/orders');
+    }
+  };
 
   const handleAddToOrder = (item: MenuItem) => {
     // If item has customizations, show customizer dialog
@@ -201,15 +231,17 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   };
 
   const handleCheckout = () => {
-    // First save current order to localStorage
+    // Save current order and order type to localStorage
     localStorage.setItem('currentOrder', JSON.stringify(orderItems));
+    localStorage.setItem('orderType', orderType);
     
     // Navigate to checkout page with the current order
     navigate('/checkout', { 
       state: { 
         items: orderItems, 
         tableId: tableId,
-        tableNumber: tableNumber
+        tableNumber: tableNumber,
+        orderType: orderType
       } 
     });
   };
@@ -232,6 +264,8 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   return children({
     orderItems,
     tableNumber,
+    orderType,
+    setOrderType: handleSetOrderType,
     handleAddToOrder,
     handleUpdateQuantity,
     handleRemoveItem,

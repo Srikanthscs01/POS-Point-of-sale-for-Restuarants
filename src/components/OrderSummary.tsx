@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { MenuItem } from './MenuCard';
 import { Coupon } from '@/data/sampleCoupons';
 import OrderContent from './order/OrderContent';
+import { OrderType } from '@/pages/orders/OrderManager';
+import { Utensils, ShoppingBag } from 'lucide-react';
 
 interface OrderSummaryProps {
   items: MenuItem[];
@@ -15,6 +16,7 @@ interface OrderSummaryProps {
   onClearOrder: () => void;
   onCheckout: () => void;
   tableNumber?: number | null;
+  orderType?: OrderType;
   appliedCoupon?: Coupon | null;
   onApplyCoupon?: (coupon: Coupon | null) => void;
 }
@@ -26,6 +28,7 @@ const OrderSummary = ({
   onClearOrder, 
   onCheckout,
   tableNumber = null,
+  orderType = 'dine-in',
   appliedCoupon = null,
   onApplyCoupon
 }: OrderSummaryProps) => {
@@ -95,6 +98,8 @@ const OrderSummary = ({
     return (item.selectedVariation || (item.selectedAddons && item.selectedAddons.length > 0));
   };
 
+  const OrderTypeIcon = orderType === 'dine-in' ? Utensils : ShoppingBag;
+
   if (isMobile) {
     return (
       <>
@@ -103,6 +108,7 @@ const OrderSummary = ({
             <OrderContent
               items={items}
               tableNumber={tableNumber}
+              orderType={orderType}
               expandedItems={expandedItems}
               total={total}
               discount={discount}
@@ -123,10 +129,15 @@ const OrderSummary = ({
               className={cn("w-full", items.length === 0 ? "opacity-90" : "")}
               onClick={() => setIsOpen(true)}
             >
-              {tableNumber
-                ? `Table ${tableNumber} Order ${itemCount > 0 ? `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}`
-                : `View Order ${itemCount > 0 ? `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}`
-              }
+              {tableNumber ? (
+                `Table ${tableNumber} Order ${itemCount > 0 ? `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}`
+              ) : (
+                <span className="flex items-center">
+                  <OrderTypeIcon className="h-4 w-4 mr-2" />
+                  {orderType === 'dine-in' ? 'Dine-In' : 'To-Go'} Order 
+                  {itemCount > 0 ? ` (${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}
+                </span>
+              )}
             </Button>
           </SheetTrigger>
         </div>
@@ -139,6 +150,7 @@ const OrderSummary = ({
       <OrderContent
         items={items}
         tableNumber={tableNumber}
+        orderType={orderType}
         expandedItems={expandedItems}
         total={total}
         discount={discount}

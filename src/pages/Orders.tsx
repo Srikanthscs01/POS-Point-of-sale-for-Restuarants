@@ -6,6 +6,7 @@ import MenuItemCustomizer from '@/components/MenuItemCustomizer';
 import OrderManager from './orders/OrderManager';
 import OrderSidePanel from './orders/OrderSidePanel';
 import MenuSection from './orders/MenuSection';
+import OrderTypeSelector from './orders/OrderTypeSelector';
 
 // Get initial menu items from localStorage if available
 const getInitialMenuItems = (): MenuItem[] => {
@@ -26,11 +27,13 @@ const Orders = () => {
 
   return (
     <PageTransition>
-      <div className="container mx-auto px-4 py-8 pt-24 flex">
+      <div className="container mx-auto px-4 py-8 pt-24 flex flex-col">
         <OrderManager menuItems={menuItems}>
           {({
             orderItems,
             tableNumber,
+            orderType,
+            setOrderType,
             handleAddToOrder,
             handleUpdateQuantity,
             handleRemoveItem,
@@ -43,23 +46,34 @@ const Orders = () => {
             addItemToOrder
           }) => (
             <>
-              {/* Menu Section - Left Side (previously right) */}
-              <MenuSection 
-                menuItems={menuItems}
-                onAddToOrder={handleAddToOrder}
-                tableNumber={tableNumber}
+              {/* Order Type Selector */}
+              <OrderTypeSelector 
+                orderType={orderType}
+                onChange={setOrderType}
+                disabled={tableNumber !== null} // Disable selector if table is selected
               />
+              
+              <div className="flex">
+                {/* Menu Section - Left Side */}
+                <MenuSection 
+                  menuItems={menuItems}
+                  onAddToOrder={handleAddToOrder}
+                  tableNumber={tableNumber}
+                  orderType={orderType}
+                />
 
-              {/* Virtual Check - Right Side (previously left) */}
-              <OrderSidePanel 
-                orderItems={orderItems}
-                tableNumber={tableNumber}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-                onClearOrder={handleClearOrder}
-                onCheckout={handleCheckout}
-                onClearTableFilter={handleClearTableFilter}
-              />
+                {/* Virtual Check - Right Side */}
+                <OrderSidePanel 
+                  orderItems={orderItems}
+                  tableNumber={tableNumber}
+                  orderType={orderType}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                  onClearOrder={handleClearOrder}
+                  onCheckout={handleCheckout}
+                  onClearTableFilter={handleClearTableFilter}
+                />
+              </div>
 
               {/* Customization Dialog */}
               {selectedItem && (
