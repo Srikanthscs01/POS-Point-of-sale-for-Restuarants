@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,10 +10,10 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import PageTransition from '@/components/PageTransition';
-import TableGrid from '@/components/TableGrid';
+import TableGrid, { Table } from '@/components/TableGrid';
 
 // Sample table data
-const sampleTables = [
+const sampleTables: Table[] = [
   { id: 1, number: 1, seats: 2, status: 'available' },
   { id: 2, number: 2, seats: 4, status: 'occupied', order: { id: 'ORD-5392', items: 4, time: '12:35 PM' } },
   { id: 3, number: 3, seats: 2, status: 'reserved', order: { id: 'RSV-421', items: 0, time: '1:00 PM' } },
@@ -34,8 +33,8 @@ const sampleTables = [
 ];
 
 const Tables = () => {
-  const [tables, setTables] = useState(sampleTables);
-  const [selectedTable, setSelectedTable] = useState<any | null>(null);
+  const [tables, setTables] = useState<Table[]>(sampleTables);
+  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [reservationDetails, setReservationDetails] = useState({
     name: '',
@@ -51,7 +50,7 @@ const Tables = () => {
     return table.status === filterStatus;
   });
 
-  const handleSelectTable = (table: any) => {
+  const handleSelectTable = (table: Table) => {
     setSelectedTable(table);
     setIsDialogOpen(true);
   };
@@ -76,7 +75,7 @@ const Tables = () => {
         table.id === selectedTable.id
           ? { 
               ...table, 
-              status: 'reserved',
+              status: 'reserved' as const,
               order: { 
                 id: `RSV-${Math.floor(Math.random() * 1000)}`, 
                 items: 0, 
@@ -100,7 +99,7 @@ const Tables = () => {
         table.id === selectedTable.id
           ? { 
               ...table, 
-              status: 'available',
+              status: 'available' as const,
               order: undefined
             }
           : table

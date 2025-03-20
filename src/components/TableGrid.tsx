@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface Table {
+export interface Table {
   id: number;
   number: number;
   seats: number;
