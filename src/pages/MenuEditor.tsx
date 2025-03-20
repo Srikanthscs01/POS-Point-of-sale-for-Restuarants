@@ -37,6 +37,7 @@ import MenuItemForm from '@/components/MenuItemForm';
 
 // Sample menu data - we'll use this as our initial state
 const initialMenuItems: MenuItem[] = [
+  // Original menu items
   {
     id: '1',
     name: 'Classic Cheeseburger',
@@ -69,6 +70,154 @@ const initialMenuItems: MenuItem[] = [
     description: 'Warm chocolate brownie with vanilla ice cream and chocolate sauce.',
     image: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
   },
+  
+  // Indian Breakfast Items - Veg
+  {
+    id: '5',
+    name: 'Masala Dosa',
+    price: 6.99,
+    category: 'Indian Breakfast (Veg)',
+    description: 'Crispy rice crepe filled with spiced potato filling, served with sambar and coconut chutney.',
+    image: 'https://images.unsplash.com/photo-1630409351217-5e0f0830942a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '6',
+    name: 'Poha',
+    price: 4.99,
+    category: 'Indian Breakfast (Veg)',
+    description: 'Flattened rice flakes cooked with onions, potatoes, and spices, garnished with fresh coriander and lemon.',
+    image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '7',
+    name: 'Idli Sambhar',
+    price: 5.99,
+    category: 'Indian Breakfast (Veg)',
+    description: 'Steamed rice cakes served with spicy lentil soup and coconut chutney.',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  
+  // Indian Breakfast Items - Non-Veg
+  {
+    id: '8',
+    name: 'Keema Paratha',
+    price: 7.99,
+    category: 'Indian Breakfast (Non-Veg)',
+    description: 'Flatbread stuffed with spiced minced meat, served with yogurt and pickle.',
+    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '9',
+    name: 'Egg Bhurji',
+    price: 5.99,
+    category: 'Indian Breakfast (Non-Veg)',
+    description: 'Spiced scrambled eggs with onions, tomatoes, and green chilies, served with buttered toast.',
+    image: 'https://images.unsplash.com/photo-1606756790138-261d2b21cd75?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  
+  // Indian Lunch Items - Veg
+  {
+    id: '10',
+    name: 'Paneer Butter Masala',
+    price: 12.99,
+    category: 'Indian Lunch (Veg)',
+    description: 'Cottage cheese cubes in a rich, creamy tomato sauce, served with naan or rice.',
+    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '11',
+    name: 'Dal Makhani',
+    price: 9.99,
+    category: 'Indian Lunch (Veg)',
+    description: 'Black lentils and kidney beans slow-cooked with cream and butter, served with jeera rice.',
+    image: 'https://images.unsplash.com/photo-1546833998-877b37c2e4c6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '12',
+    name: 'Vegetable Biryani',
+    price: 10.99,
+    category: 'Indian Lunch (Veg)',
+    description: 'Aromatic rice dish cooked with mixed vegetables and spices, served with raita.',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  
+  // Indian Lunch Items - Non-Veg
+  {
+    id: '13',
+    name: 'Butter Chicken',
+    price: 14.99,
+    category: 'Indian Lunch (Non-Veg)',
+    description: 'Tender chicken pieces in a rich, creamy tomato-based curry, a crowd favorite.',
+    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '14',
+    name: 'Lamb Rogan Josh',
+    price: 15.99,
+    category: 'Indian Lunch (Non-Veg)',
+    description: 'Slow-cooked lamb in a rich gravy with aromatic spices from Kashmir.',
+    image: 'https://images.unsplash.com/photo-1545247181-516773cae754?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '15',
+    name: 'Chicken Biryani',
+    price: 13.99,
+    category: 'Indian Lunch (Non-Veg)',
+    description: 'Fragrant basmati rice cooked with tender chicken pieces and aromatic spices.',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  
+  // Indian Dinner Items - Veg
+  {
+    id: '16',
+    name: 'Malai Kofta',
+    price: 13.99,
+    category: 'Indian Dinner (Veg)',
+    description: 'Soft potato and paneer dumplings in a creamy, mildly spiced gravy.',
+    image: 'https://images.unsplash.com/photo-1590300572834-3c2b6ec334f2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '17',
+    name: 'Palak Paneer',
+    price: 12.99,
+    category: 'Indian Dinner (Veg)',
+    description: 'Cottage cheese cubes in a creamy spinach gravy, rich in iron and flavor.',
+    image: 'https://images.unsplash.com/photo-1589647363584-f99c6f117e61?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '18',
+    name: 'Chana Masala',
+    price: 10.99,
+    category: 'Indian Dinner (Veg)',
+    description: 'Chickpeas cooked in a spicy tomato-based sauce, a North Indian specialty.',
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356c36?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  
+  // Indian Dinner Items - Non-Veg
+  {
+    id: '19',
+    name: 'Fish Curry',
+    price: 16.99,
+    category: 'Indian Dinner (Non-Veg)',
+    description: 'Fresh fish cooked in a tangy coconut milk-based curry, South Indian style.',
+    image: 'https://images.unsplash.com/photo-1626860798922-d8fdfcf27bcd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '20',
+    name: 'Chicken Tikka Masala',
+    price: 15.99,
+    category: 'Indian Dinner (Non-Veg)',
+    description: 'Grilled chicken pieces in a rich, spicy tomato-based sauce.',
+    image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: '21',
+    name: 'Prawn Masala',
+    price: 17.99,
+    category: 'Indian Dinner (Non-Veg)',
+    description: 'Succulent prawns cooked with onions, tomatoes, and a blend of aromatic spices.',
+    image: 'https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  }
 ];
 
 const MenuEditor = () => {
