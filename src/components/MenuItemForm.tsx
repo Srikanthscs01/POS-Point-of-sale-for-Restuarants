@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { MenuItem, MenuItemVariation, MenuItemAddon } from '@/components/MenuCard';
-import { X, Plus, Trash } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import BasicInfoTab from './menu-form/BasicInfoTab';
+import VariationsTab from './menu-form/VariationsTab';
+import AddonsTab from './menu-form/AddonsTab';
 
 interface MenuItemFormProps {
   item?: MenuItem;
@@ -243,247 +242,37 @@ const MenuItemForm = ({ item, onSave, onCancel, categories }: MenuItemFormProps)
         </TabsList>
 
         <ScrollArea className="h-[60vh] pr-4">
-          <TabsContent value="basic" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Item Name</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={errors.name ? 'border-red-500' : ''}
-              />
-              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Base Price ($)</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.price}
-                  onChange={handleChange}
-                  className={errors.price ? 'border-red-500' : ''}
-                />
-                {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                rows={3}
-                value={formData.description}
-                onChange={handleChange}
-                className={errors.description ? 'border-red-500' : ''}
-              />
-              {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleImageChange}
-                placeholder="https://example.com/image.jpg"
-                className={errors.image ? 'border-red-500' : ''}
-              />
-              {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
-              
-              {imagePreview && (
-                <div className="relative mt-2 rounded-md overflow-hidden aspect-video bg-gray-100">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={() => {
-                      setImagePreview('');
-                      setErrors((prev) => ({
-                        ...prev,
-                        image: 'Invalid image URL',
-                      }));
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+          <TabsContent value="basic">
+            <BasicInfoTab
+              formData={formData}
+              errors={errors}
+              categories={categories}
+              handleChange={handleChange}
+              handleImageChange={handleImageChange}
+              imagePreview={imagePreview}
+              setImagePreview={setImagePreview}
+              setErrors={setErrors}
+            />
           </TabsContent>
 
-          <TabsContent value="variations" className="space-y-6 pt-4">
-            <div className="border rounded-md p-4 space-y-4">
-              <h3 className="font-medium">Add Variation</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="var-name">Variation Name</Label>
-                  <Input
-                    id="var-name"
-                    name="name"
-                    value={newVariation.name}
-                    onChange={handleVariationChange}
-                    placeholder="e.g., Large, Spicy, etc."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="var-price">Price Adjustment ($)</Label>
-                  <Input
-                    id="var-price"
-                    name="priceAdjustment"
-                    type="number"
-                    step="0.01"
-                    value={newVariation.priceAdjustment}
-                    onChange={handleVariationChange}
-                    placeholder="2.00"
-                  />
-                </div>
-              </div>
-              <Button 
-                type="button" 
-                onClick={handleAddVariation}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Variation
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Current Variations</h3>
-              {formData.variations && formData.variations.length > 0 ? (
-                <div className="space-y-2">
-                  {formData.variations.map((variation) => (
-                    <div 
-                      key={variation.id} 
-                      className="flex items-center justify-between p-3 border rounded-md bg-muted/30"
-                    >
-                      <div>
-                        <p className="font-medium">{variation.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Price adjustment: {variation.priceAdjustment >= 0 ? '+' : ''}
-                          ${variation.priceAdjustment.toFixed(2)}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveVariation(variation.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-sm italic">No variations added yet.</p>
-              )}
-            </div>
+          <TabsContent value="variations">
+            <VariationsTab
+              variations={formData.variations || []}
+              newVariation={newVariation}
+              handleVariationChange={handleVariationChange}
+              handleAddVariation={handleAddVariation}
+              handleRemoveVariation={handleRemoveVariation}
+            />
           </TabsContent>
 
-          <TabsContent value="addons" className="space-y-6 pt-4">
-            <div className="border rounded-md p-4 space-y-4">
-              <h3 className="font-medium">Add Add-on</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="addon-name">Add-on Name</Label>
-                  <Input
-                    id="addon-name"
-                    name="name"
-                    value={newAddon.name}
-                    onChange={handleAddonChange}
-                    placeholder="e.g., Extra cheese, Bacon, etc."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="addon-price">Price ($)</Label>
-                  <Input
-                    id="addon-price"
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    value={newAddon.price}
-                    onChange={handleAddonChange}
-                    placeholder="1.00"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="addon-category">Category (optional)</Label>
-                <Input
-                  id="addon-category"
-                  name="category"
-                  value={newAddon.category}
-                  onChange={handleAddonChange}
-                  placeholder="e.g., Toppings, Sides, etc."
-                />
-              </div>
-              <Button 
-                type="button" 
-                onClick={handleAddAddon}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Add-on
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Current Add-ons</h3>
-              {formData.addons && formData.addons.length > 0 ? (
-                <div className="space-y-2">
-                  {formData.addons.map((addon) => (
-                    <div 
-                      key={addon.id} 
-                      className="flex items-center justify-between p-3 border rounded-md bg-muted/30"
-                    >
-                      <div>
-                        <p className="font-medium">{addon.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${addon.price.toFixed(2)} 
-                          {addon.category && ` • ${addon.category}`}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveAddon(addon.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-sm italic">No add-ons added yet.</p>
-              )}
-            </div>
+          <TabsContent value="addons">
+            <AddonsTab
+              addons={formData.addons || []}
+              newAddon={newAddon}
+              handleAddonChange={handleAddonChange}
+              handleAddAddon={handleAddAddon}
+              handleRemoveAddon={handleRemoveAddon}
+            />
           </TabsContent>
         </ScrollArea>
       </Tabs>
