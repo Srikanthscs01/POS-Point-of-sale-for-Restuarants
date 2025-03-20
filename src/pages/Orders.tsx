@@ -131,87 +131,11 @@ const Orders = () => {
 
   return (
     <PageTransition>
-      <div className="container mx-auto px-4 py-8 pt-24">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Menu Section */}
-          <div className="lg:col-span-2 space-y-6">
-            <header>
-              <h1 className="text-3xl font-bold">Menu</h1>
-              <p className="text-muted-foreground mt-1">Browse and add items to your order</p>
-            </header>
-
-            {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search menu..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <div className="w-full sm:w-40">
-                <select
-                  value={activeCategory}
-                  onChange={(e) => setActiveCategory(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Category Pills */}
-            <div className="flex overflow-x-auto pb-2 no-scrollbar">
-              {categories.map(category => (
-                <Button
-                  key={category}
-                  variant={activeCategory === category ? "default" : "outline"}
-                  className="mr-2 whitespace-nowrap"
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-
-            {/* Menu Items */}
-            {filteredItems.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                  <Search className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-medium">No items found</h3>
-                <p className="text-muted-foreground mt-1">Try changing your search or filter</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredItems.map((item) => (
-                  <MenuCard
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    price={item.price}
-                    description={item.description}
-                    image={item.image}
-                    category={item.category}
-                    variations={item.variations}
-                    addons={item.addons}
-                    onAddToOrder={handleAddToOrder}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Order Summary Section */}
-          <div className="lg:col-span-1 sticky top-24 h-[calc(100vh-8rem)]">
-            <div className="border rounded-lg p-6 h-full">
+      <div className="container mx-auto px-4 py-8 pt-24 flex">
+        {/* Virtual Check (25% width) - Left Side */}
+        <div className="w-1/4 pr-4">
+          <div className="sticky top-24 h-[calc(100vh-8rem)]">
+            <div className="border rounded-lg p-4 h-full">
               <OrderSummary
                 items={orderItems}
                 onUpdateQuantity={handleUpdateQuantity}
@@ -221,6 +145,82 @@ const Orders = () => {
               />
             </div>
           </div>
+        </div>
+
+        {/* Menu Section (75% width) - Right Side */}
+        <div className="w-3/4 space-y-6">
+          <header>
+            <h1 className="text-3xl font-bold">Menu</h1>
+            <p className="text-muted-foreground mt-1">Browse and add items to your order</p>
+          </header>
+
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search menu..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="w-full sm:w-40">
+              <select
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Category Pills */}
+          <div className="flex overflow-x-auto pb-2 no-scrollbar">
+            {categories.map(category => (
+              <Button
+                key={category}
+                variant={activeCategory === category ? "default" : "outline"}
+                className="mr-2 whitespace-nowrap"
+                onClick={() => setActiveCategory(category)}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+
+          {/* Menu Items */}
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                <Search className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium">No items found</h3>
+              <p className="text-muted-foreground mt-1">Try changing your search or filter</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <MenuCard
+                  key={item.id}
+                  id={item.id}
+                  name={item.name}
+                  price={item.price}
+                  description={item.description}
+                  image={item.image}
+                  category={item.category}
+                  variations={item.variations}
+                  addons={item.addons}
+                  onAddToOrder={handleAddToOrder}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Customization Dialog */}
