@@ -10,6 +10,7 @@ import Orders from "./pages/Orders";
 import Tables from "./pages/Tables";
 import History from "./pages/History";
 import Checkout from "./pages/Checkout";
+import MenuEditor from "./pages/MenuEditor";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/tables" element={<Tables />} />
             <Route path="/history" element={<History />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/menu-editor" element={<MenuEditor />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>

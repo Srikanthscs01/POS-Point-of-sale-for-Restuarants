@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Smartphone, Menu, X, Home, ChefHat, LayoutGrid, Clock, CreditCard } from 'lucide-react';
+import { Smartphone, Menu, X, Home, ChefHat, LayoutGrid, Clock, CreditCard, FileEdit } from 'lucide-react';
 import { 
   Sheet,
   SheetContent,
@@ -17,6 +17,7 @@ const navItems = [
   { name: 'Tables', path: '/tables', icon: LayoutGrid },
   { name: 'History', path: '/history', icon: Clock },
   { name: 'Checkout', path: '/checkout', icon: CreditCard },
+  { name: 'Menu Editor', path: '/menu-editor', icon: FileEdit },
 ];
 
 const Navbar = () => {
