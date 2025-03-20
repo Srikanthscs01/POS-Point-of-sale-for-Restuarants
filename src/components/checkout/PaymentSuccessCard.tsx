@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Check, Receipt, Printer, Mail, AlertCircle } from 'lucide-react';
+import { Check, Receipt, Printer, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Card,
@@ -18,16 +17,18 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PaymentSuccessCardProps {
   onNewOrder: () => void;
 }
 
 const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
-  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [activeTab, setActiveTab] = useState('email');
   
   const handlePrintReceipt = () => {
     // Create a new window to print
@@ -168,24 +169,29 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
     toast.success('Receipt printed successfully!');
   };
   
-  const handleSendEmail = () => {
-    if (!email && !phoneNumber) {
-      toast.error('Please enter an email or phone number');
+  const handleSendReceipt = () => {
+    if (activeTab === 'email' && !email) {
+      toast.error('Please enter an email address');
+      return;
+    }
+    
+    if (activeTab === 'phone' && !phoneNumber) {
+      toast.error('Please enter a phone number');
       return;
     }
     
     setIsSending(true);
     
-    // Simulate sending email
+    // Simulate sending receipt
     setTimeout(() => {
       setIsSending(false);
-      setIsEmailDialogOpen(false);
+      setIsReceiptDialogOpen(false);
       
-      if (email) {
+      if (activeTab === 'email' && email) {
         toast.success(`Receipt sent to ${email}`);
       }
       
-      if (phoneNumber) {
+      if (activeTab === 'phone' && phoneNumber) {
         toast.success(`E-bill sent to ${phoneNumber}`);
       }
       
@@ -193,6 +199,11 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
       setEmail('');
       setPhoneNumber('');
     }, 1500);
+  };
+
+  const handleSendEBill = () => {
+    setActiveTab('phone');
+    setIsReceiptDialogOpen(true);
   };
   
   return (
@@ -205,7 +216,7 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
         <p className="text-muted-foreground mb-6">Your order has been completed</p>
         
         <div className="flex justify-center space-x-3 mb-6">
-          <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+          <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Receipt className="h-4 w-4 mr-2" />
@@ -216,33 +227,48 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
               <DialogHeader>
                 <DialogTitle>Send Receipt</DialogTitle>
                 <DialogDescription>
-                  Enter an email address or phone number to receive your receipt
+                  Receive your receipt via email or e-bill to your phone
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="example@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(123) 456-7890"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                  />
-                </div>
-              </div>
+              
+              <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="py-4">
+                <TabsList className="grid grid-cols-2 mb-4">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="phone">Mobile Phone</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="email">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="example@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="phone">
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="(123) 456-7890"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                    <p className="text-sm text-muted-foreground mt-1">
+                      We'll send an e-bill to this number
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
               <DialogFooter>
-                <Button onClick={handleSendEmail} disabled={isSending}>
+                <Button onClick={handleSendReceipt} disabled={isSending}>
                   {isSending ? 'Sending...' : 'Send Receipt'}
                 </Button>
               </DialogFooter>
@@ -252,6 +278,11 @@ const PaymentSuccessCard = ({ onNewOrder }: PaymentSuccessCardProps) => {
           <Button variant="outline" size="sm" onClick={handlePrintReceipt}>
             <Printer className="h-4 w-4 mr-2" />
             Print Receipt
+          </Button>
+          
+          <Button variant="outline" size="sm" onClick={handleSendEBill}>
+            <Phone className="h-4 w-4 mr-2" />
+            Send E-Bill
           </Button>
         </div>
         
