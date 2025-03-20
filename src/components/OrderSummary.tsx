@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MenuItem } from './MenuCard';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Badge } from '@/components/ui/badge';
 
 interface OrderSummaryProps {
   items: MenuItem[];
@@ -16,6 +17,7 @@ interface OrderSummaryProps {
   onRemoveItem: (id: string) => void;
   onClearOrder: () => void;
   onCheckout: () => void;
+  tableNumber?: number | null;
 }
 
 const OrderSummary = ({ 
@@ -23,7 +25,8 @@ const OrderSummary = ({
   onUpdateQuantity, 
   onRemoveItem, 
   onClearOrder, 
-  onCheckout 
+  onCheckout,
+  tableNumber = null
 }: OrderSummaryProps) => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +90,18 @@ const OrderSummary = ({
   const OrderContent = () => (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Current Order</h2>
+        <div>
+          <h2 className="text-lg font-semibold">
+            {tableNumber ? (
+              <div className="flex items-center gap-2">
+                <span>Table {tableNumber}</span>
+                <Badge variant="outline" className="text-xs font-normal">Order</Badge>
+              </div>
+            ) : (
+              "Current Order"
+            )}
+          </h2>
+        </div>
         {items.length > 0 && (
           <Button
             variant="ghost"
@@ -247,7 +261,9 @@ const OrderSummary = ({
               onClick={onCheckout}
               disabled={items.length === 0}
             >
-              Checkout (${(total * 1.07).toFixed(2)})
+              {tableNumber 
+                ? `Checkout Table ${tableNumber} (${(total * 1.07).toFixed(2)})`
+                : `Checkout (${(total * 1.07).toFixed(2)})`}
             </Button>
           </div>
         </>
@@ -270,7 +286,10 @@ const OrderSummary = ({
               className={cn("w-full", items.length === 0 ? "opacity-90" : "")}
               onClick={() => setIsOpen(true)}
             >
-              View Order {itemCount > 0 && `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})`}
+              {tableNumber
+                ? `Table ${tableNumber} Order ${itemCount > 0 ? `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}`
+                : `View Order ${itemCount > 0 ? `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})` : ''}`
+              }
             </Button>
           </SheetTrigger>
         </div>

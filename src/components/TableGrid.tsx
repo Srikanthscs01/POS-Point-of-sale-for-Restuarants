@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Users } from 'lucide-react';
+import { AlertCircle, ExternalLink, ShoppingBag, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Tooltip,
@@ -56,7 +56,10 @@ const TableGrid = ({ tables, onSelectTable }: TableGridProps) => {
               >
                 <div className="absolute top-3 right-3 flex items-center space-x-1">
                   {table.status === 'occupied' && (
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                      <ShoppingBag className="h-4 w-4 ml-1" />
+                    </>
                   )}
                 </div>
                 
@@ -78,7 +81,16 @@ const TableGrid = ({ tables, onSelectTable }: TableGridProps) => {
                 
                 {table.order && (
                   <div className="mt-3 text-xs text-muted-foreground">
-                    {table.status === 'occupied' ? `${table.order.items} items · ${table.order.time}` : `Reserved: ${table.order.time}`}
+                    {table.status === 'occupied' ? (
+                      <div className="flex items-center">
+                        <span>{table.order.items} items · {table.order.time}</span>
+                        {table.status === 'occupied' && (
+                          <ExternalLink className="h-3 w-3 ml-1 inline" />
+                        )}
+                      </div>
+                    ) : (
+                      `Reserved: ${table.order.time}`
+                    )}
                   </div>
                 )}
               </motion.div>
@@ -90,7 +102,7 @@ const TableGrid = ({ tables, onSelectTable }: TableGridProps) => {
                 {table.order && (
                   <div className="mt-1 text-muted-foreground">
                     {table.status === 'occupied' 
-                      ? `Order #${table.order.id} · ${table.order.items} items`
+                      ? `Order #${table.order.id} · ${table.order.items} items · Click to view`
                       : `Reserved for ${table.order.time}`
                     }
                   </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ const sampleTables: Table[] = [
 ];
 
 const Tables = () => {
+  const navigate = useNavigate();
   const [tables, setTables] = useState<Table[]>(sampleTables);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,6 +53,13 @@ const Tables = () => {
   });
 
   const handleSelectTable = (table: Table) => {
+    // If the table is occupied, navigate to Orders
+    if (table.status === 'occupied' && table.order) {
+      navigate(`/orders?tableId=${table.id}&tableNumber=${table.number}`);
+      return;
+    }
+    
+    // Otherwise, show the dialog
     setSelectedTable(table);
     setIsDialogOpen(true);
   };
@@ -227,7 +236,7 @@ const Tables = () => {
                         </td>
                         <td className="p-4 text-right">
                           <Button variant="ghost" size="sm" onClick={() => handleSelectTable(table)}>
-                            Manage
+                            {table.status === 'occupied' ? 'View Order' : 'Manage'}
                           </Button>
                         </td>
                       </tr>
