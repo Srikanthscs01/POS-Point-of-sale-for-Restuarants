@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   Receipt,
   Printer,
-  Clock
+  Clock,
+  Ticket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,8 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import PageTransition from '@/components/PageTransition';
 import { MenuItem } from '@/components/MenuCard';
+import CouponApplier from '@/components/CouponApplier';
+import { Coupon } from '@/data/sampleCoupons';
 
 type PaymentMethod = 'card' | 'cash' | 'mobile';
 
@@ -44,6 +47,8 @@ const Checkout = () => {
   const [cashAmount, setCashAmount] = useState('');
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [discount, setDiscount] = useState(0);
 
   useEffect(() => {
     // Load cart from local storage
@@ -55,20 +60,43 @@ const Checkout = () => {
       // Calculate totals
       const cartSubtotal = parsedOrder.reduce((sum: number, item: MenuItem) => sum + (item.price * (item.quantity || 1)), 0);
       setSubtotal(cartSubtotal);
-      setTax(cartSubtotal * 0.07);
-      setTotal(cartSubtotal * 1.07);
       
-      // Set initial tip amount
-      setTip(cartSubtotal * 0.15);
+      // Recalculate with any applied coupon
+      calculateTotals(cartSubtotal, appliedCoupon);
     } else {
       // If no cart, redirect to orders page
       navigate('/orders');
     }
-  }, [navigate]);
+  }, [navigate, appliedCoupon]);
+
+  const calculateTotals = (subTotal: number, coupon: Coupon | null) => {
+    let discountAmount = 0;
+    
+    if (coupon) {
+      if (coupon.discountType === 'percentage') {
+        discountAmount = subTotal * (coupon.discountValue / 100);
+      } else {
+        discountAmount = coupon.discountValue;
+      }
+    }
+    
+    const discountedSubtotal = subTotal - discountAmount;
+    const taxAmount = discountedSubtotal * 0.07;
+    const totalAmount = discountedSubtotal + taxAmount;
+    
+    setDiscount(discountAmount);
+    setTax(taxAmount);
+    setTotal(totalAmount);
+    
+    // Recalculate tip based on discounted subtotal
+    if (tipPercentage > 0) {
+      setTip(discountedSubtotal * (tipPercentage / 100));
+    }
+  };
 
   const handleTipSelection = (percentage: number) => {
     setTipPercentage(percentage);
-    setTip(subtotal * (percentage / 100));
+    setTip((subtotal - discount) * (percentage / 100));
     setCustomTip('');
   };
 
@@ -81,8 +109,17 @@ const Checkout = () => {
       const tipValue = parseFloat(value);
       if (!isNaN(tipValue)) {
         setTip(tipValue);
-        setTipPercentage(Math.round((tipValue / subtotal) * 100));
+        setTipPercentage(Math.round((tipValue / (subtotal - discount)) * 100));
       }
+    }
+  };
+
+  const handleApplyCoupon = (coupon: Coupon | null) => {
+    setAppliedCoupon(coupon);
+    calculateTotals(subtotal, coupon);
+    
+    if (coupon) {
+      toast.success(`Coupon "${coupon.code}" applied successfully!`);
     }
   };
 
@@ -198,6 +235,19 @@ const Checkout = () => {
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>${formatCurrency(subtotal)}</span>
                     </div>
+                    
+                    {discount > 0 && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span className="flex items-center gap-1">
+                          <Ticket className="h-3 w-3" />
+                          {appliedCoupon?.discountType === 'percentage' 
+                            ? `Discount (${appliedCoupon.discountValue}%)`
+                            : 'Discount'}
+                        </span>
+                        <span>-${formatCurrency(discount)}</span>
+                      </div>
+                    )}
+                    
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Tax (7%)</span>
                       <span>${formatCurrency(tax)}</span>
@@ -220,6 +270,20 @@ const Checkout = () => {
           <div className="space-y-6">
             <Card className="hover-lift">
               <CardHeader>
+                <CardTitle>Discounts & Coupons</CardTitle>
+                <CardDescription>Apply any coupon codes you have</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CouponApplier 
+                  subtotal={subtotal} 
+                  onApplyCoupon={handleApplyCoupon} 
+                  appliedCoupon={appliedCoupon}
+                />
+              </CardContent>
+            </Card>
+            
+            <Card className="hover-lift">
+              <CardHeader>
                 <CardTitle>Add Tip</CardTitle>
                 <CardDescription>Show appreciation for great service</CardDescription>
               </CardHeader>
@@ -232,7 +296,7 @@ const Checkout = () => {
                       className="w-full"
                       onClick={() => handleTipSelection(percent)}
                     >
-                      {percent}% (${formatCurrency(subtotal * (percent / 100))})
+                      {percent}% (${formatCurrency((subtotal - discount) * (percent / 100))})
                     </Button>
                   ))}
                 </div>

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, MinusCircle, PlusCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, MinusCircle, PlusCircle, X, ChevronDown, ChevronUp, Ticket } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MenuItem } from './MenuCard';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
+import { Coupon } from '@/data/sampleCoupons';
 
 interface OrderSummaryProps {
   items: MenuItem[];
@@ -18,6 +19,8 @@ interface OrderSummaryProps {
   onClearOrder: () => void;
   onCheckout: () => void;
   tableNumber?: number | null;
+  appliedCoupon?: Coupon | null;
+  onApplyCoupon?: (coupon: Coupon | null) => void;
 }
 
 const OrderSummary = ({ 
@@ -26,11 +29,14 @@ const OrderSummary = ({
   onRemoveItem, 
   onClearOrder, 
   onCheckout,
-  tableNumber = null
+  tableNumber = null,
+  appliedCoupon = null,
+  onApplyCoupon
 }: OrderSummaryProps) => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
   const [total, setTotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -51,7 +57,18 @@ const OrderSummary = ({
     }, 0);
     
     setTotal(newTotal);
-  }, [items]);
+
+    // Calculate discount if coupon is applied
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percentage') {
+        setDiscount(newTotal * (appliedCoupon.discountValue / 100));
+      } else {
+        setDiscount(appliedCoupon.discountValue);
+      }
+    } else {
+      setDiscount(0);
+    }
+  }, [items, appliedCoupon]);
 
   const itemCount = items.reduce((count, item) => count + (item.quantity || 1), 0);
 
@@ -244,14 +261,27 @@ const OrderSummary = ({
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>${total.toFixed(2)}</span>
               </div>
+              
+              {appliedCoupon && discount > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span className="flex items-center gap-1">
+                    <Ticket className="h-3 w-3" />
+                    {appliedCoupon.discountType === 'percentage' 
+                      ? `Discount (${appliedCoupon.discountValue}%)`
+                      : 'Discount'}
+                  </span>
+                  <span>-${discount.toFixed(2)}</span>
+                </div>
+              )}
+              
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Tax (7%)</span>
-                <span>${(total * 0.07).toFixed(2)}</span>
+                <span>${((total - discount) * 0.07).toFixed(2)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${(total * 1.07).toFixed(2)}</span>
+                <span>${((total - discount) * 1.07).toFixed(2)}</span>
               </div>
             </div>
             
@@ -262,8 +292,8 @@ const OrderSummary = ({
               disabled={items.length === 0}
             >
               {tableNumber 
-                ? `Checkout Table ${tableNumber} (${(total * 1.07).toFixed(2)})`
-                : `Checkout (${(total * 1.07).toFixed(2)})`}
+                ? `Checkout Table ${tableNumber} (${((total - discount) * 1.07).toFixed(2)})`
+                : `Checkout (${((total - discount) * 1.07).toFixed(2)})`}
             </Button>
           </div>
         </>
