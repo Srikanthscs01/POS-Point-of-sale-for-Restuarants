@@ -21,6 +21,9 @@ const OrderTotals = ({
   tableNumber, 
   isEmpty 
 }: OrderTotalsProps) => {
+  // Calculate the final total including tax
+  const finalTotal = (total - discount) * 1.07;
+
   return (
     <div className="mt-4 pt-4 border-t">
       <div className="space-y-2">
@@ -48,7 +51,7 @@ const OrderTotals = ({
         <Separator className="my-2" />
         <div className="flex justify-between font-medium">
           <span>Total</span>
-          <span>${((total - discount) * 1.07).toFixed(2)}</span>
+          <span>${finalTotal.toFixed(2)}</span>
         </div>
       </div>
       
@@ -59,8 +62,8 @@ const OrderTotals = ({
         disabled={isEmpty}
       >
         {tableNumber 
-          ? `Checkout Table ${tableNumber} (${((total - discount) * 1.07).toFixed(2)})`
-          : `Checkout (${((total - discount) * 1.07).toFixed(2)})`}
+          ? `Checkout Table ${tableNumber} ($${finalTotal.toFixed(2)})`
+          : `Checkout ($${finalTotal.toFixed(2)})`}
       </Button>
     </div>
   );
