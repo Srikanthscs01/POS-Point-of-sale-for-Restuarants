@@ -67,10 +67,10 @@ const OrderContent = ({
         )}
       </div>
 
-      {items.length === 0 ? (
-        <EmptyOrderState />
-      ) : (
-        <>
+      <div className="flex-1 flex flex-col">
+        {items.length === 0 ? (
+          <EmptyOrderState />
+        ) : (
           <ScrollArea className="flex-1 h-[calc(100vh-280px)]">
             <div className="pr-4">
               <AnimatePresence initial={false}>
@@ -88,17 +88,18 @@ const OrderContent = ({
               </AnimatePresence>
             </div>
           </ScrollArea>
+        )}
+      </div>
 
-          <OrderTotals
-            total={total}
-            discount={discount}
-            appliedCoupon={appliedCoupon}
-            onCheckout={onCheckout}
-            tableNumber={tableNumber}
-            isEmpty={items.length === 0}
-          />
-        </>
-      )}
+      {/* Always show the OrderTotals component */}
+      <OrderTotals
+        total={total}
+        discount={discount}
+        appliedCoupon={appliedCoupon}
+        onCheckout={onCheckout}
+        tableNumber={tableNumber}
+        isEmpty={items.length === 0}
+      />
     </div>
   );
 };
