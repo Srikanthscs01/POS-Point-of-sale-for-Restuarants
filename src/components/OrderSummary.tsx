@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,9 @@ interface OrderSummaryProps {
   onRemoveItem: (id: string) => void;
   onClearOrder: () => void;
   onCheckout: () => void;
+  onSendToKitchen?: () => void;
   tableNumber?: number | null;
+  tableTime?: string;
   orderType?: OrderType;
   appliedCoupon?: Coupon | null;
   onApplyCoupon?: (coupon: Coupon | null) => void;
@@ -27,7 +30,9 @@ const OrderSummary = ({
   onRemoveItem, 
   onClearOrder, 
   onCheckout,
+  onSendToKitchen,
   tableNumber = null,
+  tableTime,
   orderType = 'dine-in',
   appliedCoupon = null,
   onApplyCoupon
@@ -108,6 +113,7 @@ const OrderSummary = ({
             <OrderContent
               items={items}
               tableNumber={tableNumber}
+              tableTime={tableTime}
               orderType={orderType}
               expandedItems={expandedItems}
               total={total}
@@ -119,6 +125,7 @@ const OrderSummary = ({
               onRemoveItem={onRemoveItem}
               onClearOrder={onClearOrder}
               onCheckout={onCheckout}
+              onSendToKitchen={onSendToKitchen}
             />
           </SheetContent>
         </Sheet>
@@ -150,6 +157,7 @@ const OrderSummary = ({
       <OrderContent
         items={items}
         tableNumber={tableNumber}
+        tableTime={tableTime}
         orderType={orderType}
         expandedItems={expandedItems}
         total={total}
@@ -161,6 +169,7 @@ const OrderSummary = ({
         onRemoveItem={onRemoveItem}
         onClearOrder={onClearOrder}
         onCheckout={onCheckout}
+        onSendToKitchen={onSendToKitchen}
       />
     </div>
   );

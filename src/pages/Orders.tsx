@@ -32,6 +32,7 @@ const Orders = () => {
           {({
             orderItems,
             tableNumber,
+            tableTime,
             orderType,
             setOrderType,
             handleAddToOrder,
@@ -39,6 +40,7 @@ const Orders = () => {
             handleRemoveItem,
             handleClearOrder,
             handleCheckout,
+            handleSendToKitchen,
             handleClearTableFilter,
             selectedItem,
             isCustomizerOpen,
@@ -66,11 +68,13 @@ const Orders = () => {
                 <OrderSidePanel 
                   orderItems={orderItems}
                   tableNumber={tableNumber}
+                  tableTime={tableTime}
                   orderType={orderType}
                   onUpdateQuantity={handleUpdateQuantity}
                   onRemoveItem={handleRemoveItem}
                   onClearOrder={handleClearOrder}
                   onCheckout={handleCheckout}
+                  onSendToKitchen={handleSendToKitchen}
                   onClearTableFilter={handleClearTableFilter}
                 />
               </div>

@@ -6,22 +6,26 @@ import { OrderType } from './OrderManager';
 interface OrderSidePanelProps {
   orderItems: MenuItem[];
   tableNumber: number | null;
+  tableTime?: string;
   orderType: OrderType;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onClearOrder: () => void;
   onCheckout: () => void;
+  onSendToKitchen: () => void;
   onClearTableFilter: () => void;
 }
 
 const OrderSidePanel = ({ 
   orderItems, 
   tableNumber,
+  tableTime,
   orderType,
   onUpdateQuantity, 
   onRemoveItem, 
   onClearOrder, 
   onCheckout,
+  onSendToKitchen,
   onClearTableFilter
 }: OrderSidePanelProps) => {
   return (
@@ -32,7 +36,9 @@ const OrderSidePanel = ({
         onRemoveItem={onRemoveItem}
         onClearOrder={onClearOrder}
         onCheckout={onCheckout}
+        onSendToKitchen={onSendToKitchen}
         tableNumber={tableNumber}
+        tableTime={tableTime}
         orderType={orderType}
       />
       

@@ -41,11 +41,15 @@ const tableOrders: Record<number, MenuItem[]> = {
   ]
 };
 
+// Keep track of when tables became active
+const tableActiveTimes: Record<number, Date> = {};
+
 interface OrderManagerProps {
   menuItems: MenuItem[];
   children: (props: {
     orderItems: MenuItem[];
     tableNumber: number | null;
+    tableTime: string | undefined;
     orderType: OrderType;
     setOrderType: (type: OrderType) => void;
     handleAddToOrder: (item: MenuItem) => void;
@@ -53,6 +57,7 @@ interface OrderManagerProps {
     handleRemoveItem: (id: string) => void;
     handleClearOrder: () => void;
     handleCheckout: () => void;
+    handleSendToKitchen: () => void;
     handleClearTableFilter: () => void;
     selectedItem: MenuItem | null;
     isCustomizerOpen: boolean;
@@ -69,7 +74,32 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [tableId, setTableId] = useState<number | null>(null);
+  const [tableTime, setTableTime] = useState<string | undefined>(undefined);
   const [orderType, setOrderType] = useState<OrderType>('dine-in');
+  const [tableTimeInterval, setTableTimeInterval] = useState<number | null>(null);
+
+  // Function to format time duration
+  const formatTimeDuration = (startTime: Date): string => {
+    const now = new Date();
+    const diffMs = now.getTime() - startTime.getTime();
+    
+    const minutes = Math.floor(diffMs / 60000);
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${remainingMinutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  };
+
+  // Update the table time display
+  const updateTableTime = () => {
+    if (tableId !== null && tableActiveTimes[tableId]) {
+      setTableTime(formatTimeDuration(tableActiveTimes[tableId]));
+    }
+  };
 
   // Parse URL query parameters for table information
   useEffect(() => {
@@ -89,6 +119,22 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
       setTableId(parsedTableId);
       setTableNumber(parsedTableNumber);
       setOrderType('dine-in'); // If table is specified, it's always dine-in
+      
+      // Set or initialize the table active time
+      if (!tableActiveTimes[parsedTableId]) {
+        tableActiveTimes[parsedTableId] = new Date();
+      }
+      
+      // Update the table time immediately
+      updateTableTime();
+      
+      // Set up an interval to update the table time every minute
+      if (tableTimeInterval) {
+        clearInterval(tableTimeInterval);
+      }
+      
+      const interval = window.setInterval(updateTableTime, 60000); // Update every minute
+      setTableTimeInterval(interval);
       
       // Load order items for this table
       if (tableOrders[parsedTableId]) {
@@ -115,6 +161,13 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
         setOrderType(savedOrderType as OrderType);
       }
     }
+    
+    // Clean up interval on unmount
+    return () => {
+      if (tableTimeInterval) {
+        clearInterval(tableTimeInterval);
+      }
+    };
   }, [location.search]);
 
   // Update order type handler
@@ -128,6 +181,24 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
       setTableNumber(null);
       navigate('/orders');
     }
+  };
+
+  // Send to kitchen handler
+  const handleSendToKitchen = () => {
+    if (orderItems.length === 0) {
+      toast.error("No items to send to kitchen");
+      return;
+    }
+    
+    toast.success(`Order sent to kitchen for ${tableNumber ? `Table ${tableNumber}` : orderType === 'dine-in' ? 'Dine-In' : 'To-Go'}`);
+    
+    // In a real application, you would send the order to a backend API
+    console.log("Sending to kitchen:", {
+      tableNumber,
+      orderType,
+      items: orderItems,
+      timestamp: new Date().toISOString()
+    });
   };
 
   const handleAddToOrder = (item: MenuItem) => {
@@ -251,6 +322,13 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
     setTableId(null);
     setTableNumber(null);
     setOrderItems([]);
+    setTableTime(undefined);
+    
+    // Clear the interval
+    if (tableTimeInterval) {
+      clearInterval(tableTimeInterval);
+      setTableTimeInterval(null);
+    }
     
     // Update URL to remove query parameters
     navigate('/orders');
@@ -264,6 +342,7 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
   return children({
     orderItems,
     tableNumber,
+    tableTime,
     orderType,
     setOrderType: handleSetOrderType,
     handleAddToOrder,
@@ -271,6 +350,7 @@ const OrderManager = ({ menuItems, children }: OrderManagerProps) => {
     handleRemoveItem,
     handleClearOrder,
     handleCheckout,
+    handleSendToKitchen,
     handleClearTableFilter,
     selectedItem,
     isCustomizerOpen,

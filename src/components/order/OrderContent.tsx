@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Utensils, ShoppingBag } from 'lucide-react';
+import { Trash2, Utensils, ShoppingBag, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AnimatePresence } from 'framer-motion';
 import { MenuItem } from '@/components/MenuCard';
@@ -15,6 +15,7 @@ interface OrderContentProps {
   items: MenuItem[];
   tableNumber: number | null | undefined;
   orderType: OrderType | undefined;
+  tableTime?: string;
   expandedItems: Set<string>;
   total: number;
   discount: number;
@@ -25,12 +26,14 @@ interface OrderContentProps {
   onRemoveItem: (id: string) => void;
   onClearOrder: () => void;
   onCheckout: () => void;
+  onSendToKitchen?: () => void;
 }
 
 const OrderContent = ({
   items,
   tableNumber,
   orderType = 'dine-in',
+  tableTime,
   expandedItems,
   total,
   discount,
@@ -40,7 +43,8 @@ const OrderContent = ({
   onUpdateQuantity,
   onRemoveItem,
   onClearOrder,
-  onCheckout
+  onCheckout,
+  onSendToKitchen
 }: OrderContentProps) => {
   const OrderTypeIcon = orderType === 'dine-in' ? Utensils : ShoppingBag;
 
@@ -62,6 +66,13 @@ const OrderContent = ({
               </div>
             )}
           </h2>
+          {/* Display table active time if available */}
+          {tableTime && tableNumber && (
+            <div className="flex items-center mt-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3 mr-1" />
+              <span>Active: {tableTime}</span>
+            </div>
+          )}
         </div>
         {items.length > 0 && (
           <Button
@@ -110,6 +121,7 @@ const OrderContent = ({
           discount={discount}
           appliedCoupon={appliedCoupon}
           onCheckout={onCheckout}
+          onSendToKitchen={onSendToKitchen}
           tableNumber={tableNumber}
           orderType={orderType}
           isEmpty={items.length === 0}

@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import { Coupon } from '@/data/sampleCoupons';
 import { OrderType } from '@/pages/orders/OrderManager';
-import { Utensils, ShoppingBag } from 'lucide-react';
+import { Utensils, ShoppingBag, Send } from 'lucide-react';
 
 interface OrderTotalsProps {
   total: number;
   discount?: number;
   appliedCoupon?: Coupon | null;
   onCheckout: () => void;
+  onSendToKitchen?: () => void;
   tableNumber?: number | null;
   orderType?: OrderType;
   isEmpty: boolean;
@@ -20,6 +21,7 @@ const OrderTotals = ({
   discount = 0, 
   appliedCoupon = null,
   onCheckout,
+  onSendToKitchen,
   tableNumber = null,
   orderType = 'dine-in',
   isEmpty 
@@ -51,6 +53,18 @@ const OrderTotals = ({
         <span>Total</span>
         <span>{formatCurrency(finalTotal)}</span>
       </div>
+      
+      {/* Only show the Send to Kitchen button for dine-in orders with a table number */}
+      {orderType === 'dine-in' && tableNumber && !isEmpty && onSendToKitchen && (
+        <Button 
+          onClick={onSendToKitchen}
+          variant="outline"
+          className="w-full"
+        >
+          <Send className="h-4 w-4 mr-2" />
+          Send to Kitchen (KOT)
+        </Button>
+      )}
       
       <Button 
         onClick={onCheckout} 
