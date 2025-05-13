@@ -32,7 +32,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <Smartphone className="h-6 w-6 text-primary" />
-              <span className="text-xl font-medium">TastePOS</span>
+              <span className="text-xl font-medium">restroPOS</span>
             </Link>
           </div>
 
